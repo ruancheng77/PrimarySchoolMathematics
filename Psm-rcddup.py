@@ -74,9 +74,9 @@ class Generator(object):
         elif signum == 2:
             self.signum = "-"
         elif signum == 3:
-            self.signum = "×"
+            self.signum = "*"
         elif signum == 4:
-            self.signum = "÷"
+            self.signum = "/"
 
         self.range = range
         self.need_carry = need_carry
@@ -92,9 +92,9 @@ class Generator(object):
         if self.need_carry == 1:
             return True
         is_carry = self.__is_carry(a, b)
-        if self.need_carry == 2 and (self.signum == "+" or self.signum == "*") and (self.__get_num(a) + self.__get_num(b) < 10):
+        if self.need_carry == 2 and (self.signum == "+" or self.signum == "*") and ( len(str(eval("{}{}{}".format(a, self.signum, b)))) > max(len(str(a)), len(str(b))) ):
             return True
-        elif self.need_carry == 3 and (self.signum == "-" or self.signum == "÷") and ( len(str(eval("{}{}{}".format(a, self.signum, b)))) < min(len(str(a)), len(str(b))) ):
+        elif self.need_carry == 3 and (self.signum == "-" or self.signum == "/") and ( len(str(eval("{}{}{}".format(a, self.signum, b)))) < min(len(str(a)), len(str(b))) ):
             return True
         else:
             return False
@@ -147,7 +147,7 @@ class Generator(object):
 
 
 def main():
-    g = Generator(signum=2, range=(0, 20), need_carry=3, step=1, filter=(0, 10), same=True)
+    g = Generator(signum=3, range=(0, 20), need_carry=2, step=1, filter=(0, 10), same=True)
     g.produce(20)
 
 
