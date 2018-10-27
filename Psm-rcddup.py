@@ -33,18 +33,21 @@ import random
 
 class Generator(object):
     '''
-    - @sigunm   int     
+    - @sigunm   int
         运算符 (1: 加, 2: 减, 3: 乘, 4: 除)
     - @range    tuple
         随机范围, 默认: (0, 10)
     - @need_carry    int
         进位, 退位运算(1: 随机, 2: 进位, 3: 退位), 默认: 1
+        进位: 加法和乘法运算时, 才会产生进位
+        退位: 减法和出发运算时, 才会产生退位
     - @step int
         生成几步运算, 默认: 1
     - @filter tuple
         需要过滤的值
     - @same boolean
         是否相同
+    - @
     '''
 
     signum = None
@@ -83,9 +86,18 @@ class Generator(object):
         self.min = min(range)
         self.max = max(range)
         self.__data_list = []
-    
-    def __is_valid(self, data):
-        pass
+        
+    def __is_valid(self, a, b):
+        '''校验生成数值是否符合配置要求'''
+        if self.need_carry == 1:
+            return True
+        is_carry = self.__is_carry(a, b)
+        if self.need_carry == 2 and (self.signum == "+" or self.signum == "*") and (self.__get_num(a) + self.__get_num(b) < 10):
+            return True
+        elif self.need_carry == 3 and (self.signum == "-" or self.signum == "÷") and ( len(str(eval("{}{}{}".format(a, self.signum, b)))) < min(len(str(a)), len(str(b))) ):
+            return True
+        else:
+            return False
         
     def __get_num(self, number):
         '''反回一个整数的个位数'''
@@ -99,20 +111,12 @@ class Generator(object):
             return False
         else:
             return True
-
+    
     def __get_topic(self, a, b):
         '''根据两个数字返回一道单步口算加法题'''
-        # 判断两个随机生成的数字不能相同， 不能为过滤列表中的数字，如果条件符合，即可生成算式
-
         if a != b and not (a in self.filter) and not (b in self.filter):
-            if (self.need_carry == 1):  # 随机的不论是否进位
+            if self.__is_valid(a, b):
                 return "{}{}{}=".format(a, self.signum, b)
-            elif (self.need_carry == 2):  # 如果需要进位
-                if (self.__is_carry(a, b)):  # 判断是必须为进位
-                    return "{}{}{}=".format(a, self.signum, b)
-            elif (self.need_carry == 3):  # 如果需要不进位subtractlist['abdication']
-                if (not self.__is_carry(a, b)):  # 判断是必须为不进位
-                    return "{}{}{}=".format(a, self.signum, b)
         else:
             return False
 
@@ -143,7 +147,7 @@ class Generator(object):
 
 
 def main():
-    g = Generator(signum=1, range=(0, 20), need_carry=2, step=1, filter=(0, 10), same=True)
+    g = Generator(signum=2, range=(0, 20), need_carry=3, step=1, filter=(0, 10), same=True)
     g.produce(20)
 
 
